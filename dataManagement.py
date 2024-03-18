@@ -3,7 +3,7 @@ from datetime import datetime
 def parse_date(time):
    months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
    date = time.split("/")
-   return datetime.strptime(str(date[0][1:])+"/"+str(month.index(date[1])+1)+"/"+str(date[2]), "%d/%m/%Y:%H:%M:%S")
+   return datetime.strptime(str(date[0][1:])+"/"+str(months.index(date[1])+1)+"/"+str(date[2]), "%d/%m/%Y:%H:%M:%S")
 
 def read_log(file_path):
   with open(file_path,"r", encoding="utf8") as file:
