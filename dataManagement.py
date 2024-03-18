@@ -91,8 +91,8 @@ def print_dict_entry_dates(log_dict):
 
     sorted_entries = sort_log(entries, "time")
             
-    print("Date of the first one: " + str(sorted_entries[0]))
-    print("Date of the last one: " +  str(sorted_entries[-1]))
+    print("Date of the first one: " + str(sorted_entries[0]['time']))
+    print("Date of the last one: " +  str(sorted_entries[-1]['time']))
     # print("Ratio od requests with code 200 to the rest: ")
     # print("Code 200: " + str(amount_of_entries_with_200))
     # print("Rest: " + str(amount_of_entries - amount_of_entries_with_200))
