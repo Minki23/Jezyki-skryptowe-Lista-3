@@ -1,14 +1,13 @@
 from datetime import datetime
 
-def parse_date(log):
-   month=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
-   date = log.split("/")
-   return datetime.strptime(str(date[0][1:])+"/"+str(month.index(date[1]))+"/"+str(date[2][:4]), "%d/%m/%Y")
+def parse_date(time):
+   months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+   date = time.split("/")
+   return datetime.strptime(str(date[0][1:])+"/"+str(month.index(date[1])+1)+"/"+str(date[2]), "%d/%m/%Y:%H:%M:%S")
 
 def read_log(file_path):
-  with  open(file_path,"r", encoding="utf8") as file:
+  with open(file_path,"r", encoding="utf8") as file:
     log_list =[]
-    iter = 0
     for entry in file:
       contents = entry.split('"')
       request = contents[1]
@@ -22,13 +21,12 @@ def read_log(file_path):
         rest = str(contents[0]) + str(contents[i-1:])
       rest = list(filter(lambda elem: elem != '-', rest.split(" ")))
       edited = '0' if rest[5][0:-4] == '-' else rest[5][0:-4]
-      iter+=1
-      log_list.append((rest[0],parse_date(rest[1]+rest[2]),request,int(rest[4]),int(edited)))
+      log_list.append((rest[0],parse_date(rest[1]),request,int(rest[4]),int(edited)))
     return log_list
   
-def sort_log(log_list,index):
+def sort_log(log_list,sort_index):
   try:
-    return sorted(log_list, key=lambda x:x[index])
+    return sorted(log_list, key=lambda x:x[sort_index])
   except:
     print("Invalid index! Please enter a valid")
 
@@ -36,7 +34,7 @@ def get_entries_by_addr(log_list,address):
   return [entry for entry in log_list if address in entry[0]]
 
 def get_entries_by_code(log_list,status_code):
-  return [entry for entry in log_list if status_code == entry[3]]
+  return [entry for entry in log_list if entry["code"] == status_code]
 
 def get_failed_reads(log_list, split:bool):
   if split:
@@ -50,7 +48,7 @@ def get_failed_reads(log_list, split:bool):
           log400.append(log)
     return (log400,log500)
   else:
-    return [entry for entry in log_list if 600>=entry[3]>=400]
+    return [entry for entry in log_list if 600>entry[3]>=400]
   
 def get_entires_by_extension(log_list,extn):
   return [entry for entry in log_list if extn in entry[2]]
@@ -85,26 +83,21 @@ def get_addrs(log_dict):
 def print_dict_entry_dates(log_dict):
   for ip, entries in log_dict.items():
     amount_of_entries = len(entries)
-   # amount_of_entries_with_200 = len(get_entries_by_code(entries, "200"))
-    print("Address: " + str(ip))
-    print("How many requests: " + str(amount_of_entries) )
-
+    amount_of_entries_with_200 = len(get_entries_by_code(entries, 200))
     sorted_entries = sort_log(entries, "time")
-            
-    print("Date of the first one: " + str(sorted_entries[0]['time']))
-    print("Date of the last one: " +  str(sorted_entries[-1]['time']))
-    # print("Ratio od requests with code 200 to the rest: ")
-    # print("Code 200: " + str(amount_of_entries_with_200))
-    # print("Rest: " + str(amount_of_entries - amount_of_entries_with_200))
-    # print("Ratio: " + str(amount_of_entries_with_200/amount_of_entries) + + "\n")
+           
+    print(f"""
+    Address: {ip}
+    How many requests: {amount_of_entries}
+    Date of the first one: {sorted_entries[0]['time']}
+    Date of the last one: {sorted_entries[-1]['time']}
+    Ratio od requests with code 200 to the rest:
+    Code 200: {amount_of_entries_with_200}
+    Rest: {amount_of_entries - amount_of_entries_with_200}
+    Ratio: {amount_of_entries_with_200/amount_of_entries}
+    """)
 
 
 if __name__ == "__main__":
   log_list = read_log("NASA")
-  #Testowanie
-  print(print_entries(get_entries_by_addr(log_list,"/style.css" )))
-  print("\n\n")
-  print(print_entries(sort_log(get_entries_by_code(log_list,404),1)))
-  print("\n\n")
-  print(len(get_failed_reads(log_list,False)))
   print_dict_entry_dates(log_to_dict(log_list))
