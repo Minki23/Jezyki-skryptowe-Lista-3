@@ -59,6 +59,27 @@ def print_entries(log_list):
   for log in log_list:
     print(log)
 
+def entry_to_dict(log):
+  dict = {
+    "ip" : log[0],
+    "time" : log[1],
+    "method" : log[2],
+    "code" : log[3],
+    "size_in_bytes" : log[4]
+  }
+  return dict
+
+def log_to_dict(log_list):
+  log_dict= {}
+  for log in log_list:
+    ip = log[0] 
+    log_dict[ip] = entry_to_dict(log)
+  return log_dict
+
+def get_addrs(log_dict):
+  return list(log_dict.keys())
+
+
 if __name__ == "__main__":
   log_list = read_log("NASA")
   #Testowanie
