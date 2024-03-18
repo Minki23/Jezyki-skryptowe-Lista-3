@@ -73,11 +73,30 @@ def log_to_dict(log_list):
   log_dict= {}
   for log in log_list:
     ip = log[0] 
-    log_dict[ip] = entry_to_dict(log)
+    if ip in log_dict:
+      log_dict[ip].append(entry_to_dict(log))
+    else:
+      log_dict[ip] = [entry_to_dict(log)]  
   return log_dict
 
 def get_addrs(log_dict):
   return list(log_dict.keys())
+
+def print_dict_entry_dates(log_dict):
+  for ip, entries in log_dict.items():
+    amount_of_entries = len(entries)
+   # amount_of_entries_with_200 = len(get_entries_by_code(entries, "200"))
+    print("Address: " + str(ip))
+    print("How many requests: " + str(amount_of_entries) )
+
+    sorted_entries = sort_log(entries, "time")
+            
+    print("Date of the first one: " + str(sorted_entries[0]))
+    print("Date of the last one: " +  str(sorted_entries[-1]))
+    # print("Ratio od requests with code 200 to the rest: ")
+    # print("Code 200: " + str(amount_of_entries_with_200))
+    # print("Rest: " + str(amount_of_entries - amount_of_entries_with_200))
+    # print("Ratio: " + str(amount_of_entries_with_200/amount_of_entries) + + "\n")
 
 
 if __name__ == "__main__":
@@ -88,3 +107,4 @@ if __name__ == "__main__":
   print(print_entries(sort_log(get_entries_by_code(log_list,404),1)))
   print("\n\n")
   print(len(get_failed_reads(log_list,False)))
+  print_dict_entry_dates(log_to_dict(log_list))
